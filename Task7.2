@@ -1,0 +1,75 @@
+import RPi.GPIO as GPIO
+import time
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+Trig = 12
+Echo = 13
+Led = 14
+
+
+range1 = 10.00
+range2 = 20.00
+range3 = 30.00
+
+print("Distance Measurement In Progress")
+
+GPIO.setup(Trig,GPIO.OUT) #Sets trigger pin as an output
+GPIO.setup(Echo,GPIO.IN) #Sets echo pin as an input
+GPIO.setup(Led,GPIO.OUT) #Sets buzzer pin as an output
+
+pwm = GPIO.PWM(Led, 100)
+pwm.start(0) #Starts pwm at 0% duty cycle
+
+try:
+    while True:
+
+
+        GPIO.output(Trig, False) #If output of trigger is false
+        print("Measuring Distance...")
+        time.sleep(2) #Delay 2 seconds
+
+        GPIO.output(Trig, True) #If output of trigger is true
+        time.sleep(0.00001) #Tiny delay
+        GPIO.output(Trig, False) #Then set output to False
+
+        while GPIO.input(Echo)==0: #While an echo is not present
+            pulse_start = time.time() #
+
+        while GPIO.input(Echo)==1:
+            pulse_end = time.time()
+
+        pulse_duration = pulse_end - pulse_start
+
+        distance = pulse_duration * 17150
+
+        distance = round(distance, 2)
+        
+         if distance < range1:
+                print("Distance is close")
+                pwm.ChangeDutyCycle(100)
+                time.sleep(0.1)
+
+
+
+        elif range2 > distance > range1:
+                print("Distance is far")
+                pwm.ChangeDutyCycle(30)
+                time.sleep(0.1)
+
+        elif range3 > distance > range2:
+                print("Distance is far far away")
+                pwm.ChangeDutyCycle(10)
+                time.sleep(0.1)
+
+        else:
+                print("Don't bother")
+                pwm.ChangeDutyCycle(0)
+                time.sleep(0.1)
+                print("Distance: ",distance,"cm")
+
+except KeyboardInterrupt: # If there is a KeyboardInterrupt (when you press ctrl+c), exit the program
+    print("Cleaning up!")
+    gpio.cleanup()
+
+        
