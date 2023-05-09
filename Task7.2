@@ -3,28 +3,27 @@ import time
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-Trig = 12
-Echo = 13
-Led = 14
+#BCM pin layout
+Trig = 12 #Sets trigger pin to be pin 12 
+Echo = 13 #Sets echo pin to be pin 13
+Led = 14 #Sets Led pin to pin 14 
 
 
-range1 = 10.00
-range2 = 20.00
-range3 = 30.00
+range1 = 10.00 #Range of 10cm
+range2 = 20.00 #Range of 20cm
+range3 = 30.00 #Range of 30cm
 
 print("Distance Measurement In Progress")
 
 GPIO.setup(Trig,GPIO.OUT) #Sets trigger pin as an output
 GPIO.setup(Echo,GPIO.IN) #Sets echo pin as an input
-GPIO.setup(Led,GPIO.OUT) #Sets buzzer pin as an output
+GPIO.setup(Led,GPIO.OUT) #Sets led pin as an output
 
-pwm = GPIO.PWM(Led, 100)
-pwm.start(0) #Starts pwm at 0% duty cycle
+pwm = GPIO.PWM(Led, 100) #Assigns the pwm of the led to a variable
+pwm.start(0) #Starts pwm at 0% duty cycle 
 
 try:
     while True:
-
-
         GPIO.output(Trig, False) #If output of trigger is false
         print("Measuring Distance...")
         time.sleep(2) #Delay 2 seconds
@@ -34,37 +33,38 @@ try:
         GPIO.output(Trig, False) #Then set output to False
 
         while GPIO.input(Echo)==0: #While an echo is not present
-            pulse_start = time.time() #
+            pulse_start = time.time() #Starts the duration of the pulse
 
         while GPIO.input(Echo)==1:
-            pulse_end = time.time()
+            pulse_end = time.time() #Ends the duration of the pulse
 
-        pulse_duration = pulse_end - pulse_start
+        pulse_duration = pulse_end - pulse_start #Duration = end time of pulse - start time of pulse
 
-        distance = pulse_duration * 17150
+        distance = pulse_duration * 17150 #Calculates the distance and assigns it to a variable
 
-        distance = round(distance, 2)
+        distance = round(distance, 2) #Rounds the distance to 2 decimal values
         
-         if distance < range1:
+        
+        
+         if distance < range1: #If distance is less than 10cm
                 print("Distance is close")
-                pwm.ChangeDutyCycle(100)
+                pwm.ChangeDutyCycle(100) #Duty cycle is changed to 100% (full brightness)
                 time.sleep(0.1)
 
 
-
-        elif range2 > distance > range1:
+        elif range2 > distance > range1: #If distance is less than 20cm, but greater than 10cm
                 print("Distance is far")
-                pwm.ChangeDutyCycle(30)
+                pwm.ChangeDutyCycle(30) #Duty cycle is changed to 30%
                 time.sleep(0.1)
 
-        elif range3 > distance > range2:
+        elif range3 > distance > range2: #If distance is less than 30cm, but greater than 20cm
                 print("Distance is far far away")
-                pwm.ChangeDutyCycle(10)
+                pwm.ChangeDutyCycle(10) #Duty cycle is changed to 10%
                 time.sleep(0.1)
 
-        else:
+        else: #Any other range
                 print("Don't bother")
-                pwm.ChangeDutyCycle(0)
+                pwm.ChangeDutyCycle(0) #Duty cycle is set to 0% (inactive)
                 time.sleep(0.1)
                 print("Distance: ",distance,"cm")
 
